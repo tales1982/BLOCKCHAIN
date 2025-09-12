@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+struct Campaign {
+    address author;
+    string title;
+    string description;
+    string videoUrl;
+    string imageUrl;
+    uint256 balance;
+    bool active;
+}
+
+contract DonateCrypto {
+    uint256 public fee = 100; // taxa que será cobrada
+    uint256 public nextId = 0; // contador de IDs de campanhas
+
+    mapping(uint256 => Campaign) public campaigns; // mapeamento de campanhas por ID
+
+    // Eventos para registrar as principais ações
+    event CampaignCreated(uint256 id, address author, string title);
+    event DonationReceived(uint256 id, address donor, uint256 amount);
+    event WithdrawalMade(uint256 id, address recipient, uint256 amount);
+
+    // Função para criar uma nova campanha
+    function addCampaign(
+        string calldata title,
+        string calldata description,
+        string calldata videoUrl,
+        string calldata imageUrl
+    ) public {
+        // Criar uma nova campanha com os valores fornecidos
+        Campaign memory newCampaign;
+        newCampaign.title = title;
+        newCampaign.description = description;
+        newCampaign.videoUrl = videoUrl;
+        newCampaign.imageUrl = imageUrl;
+        newCampaign.active = true;
+        newCampaign.author = msg.sender;
+
+        // Armazena a nova campanha no mapeamento e emite o evento
+        campaigns[nextId] = newCampaign;
+        emit CampaignCreated(nextId, msg.sender, title);
+
+        // Incrementa o ID para a próxima campanha
+        nextId++;
+    }
+
+    // Função para enviar cripto para a campanha
+    function donate(uint256 id) public payable {
+        // Validar que a doação é maior que 0
+        require(msg.value > 0, "You must send a donation value greater than 0");
+
+        // Verificar se a campanha está ativa
+        require(
+            campaigns[id].active == true,
+            "Cannot donate to an inactive campaign"
+        );
+
+        // Adicionar o valor da doação ao saldo da campanha
+        campaigns[id].balance += msg.value;
+
+        // Emitir evento de doação
+        emit DonationReceived(id, msg.sender, msg.value);
+    }
+
+    // Função para sacar fundos da campanha
+    function withdraw(uint256 id) public {
+        // Acessa a campanha diretamente no mapeamento
+        Campaign storage campaign = campaigns[id];
+
+        // Verifica se o remetente é o autor da campanha
+        require(campaign.author == msg.sender, "You do not have permission");
+
+        // Verifica se a campanha ainda está ativa
+        require(campaign.active == true, "This campaign is closed");
+
+        // Verifica se o saldo da campanha é maior que a taxa (fee)
+        require(campaign.balance > fee, "This campaign does not have enough balance");
+
+        // Marca a campanha como inativa e zera o saldo
+        campaign.active = false;
+        uint256 amountToTransfer = campaign.balance - fee;
+        campaign.balance = 0;
+
+        // Transferir o valor para o autor da campanha, subtraindo a taxa
+        address payable recipient = payable(campaign.author);
+        (bool success, ) = recipient.call{value: amountToTransfer}("");
+        require(success, "Transfer failed");
+
+        // Emitir evento de saque
+        emit WithdrawalMade(id, msg.sender, amountToTransfer);
+    }
+}

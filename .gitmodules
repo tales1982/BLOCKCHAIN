@@ -1,0 +1,36 @@
+[submodule "GoBlockchain/lib/forge-std"]
+	path = GoBlockchain/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "lib/chainlink-brownie-contracts"]
+	path = lib/chainlink-brownie-contracts
+	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "DIO/Tokem_padrao_erc20/lib/forge-std"]
+	path = DIO/Tokem_padrao_erc20/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "DIO/Tokem_padrao_erc20/lib/openzeppelin-contracts"]
+	path = DIO/Tokem_padrao_erc20/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "Prof_Pietro/WORKSPACES/lib/forge-std"]
+	path = Prof_Pietro/WORKSPACES/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "LuizTools/Curs_Solidity/01-BookDataBase/lib/forge-std"]
+	path = LuizTools/Curs_Solidity/01-BookDataBase/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "LuizTools/Courso_solidity/lib/forge-std"]
+	path = LuizTools/Courso_solidity/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "ORACLES/01-chainlink-foundry/lib/forge-std"]
+	path = ORACLES/01-chainlink-foundry/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "ORACLES/01-chainlink-foundry/lib/chainlink-brownie-contracts"]
+	path = ORACLES/01-chainlink-foundry/lib/chainlink-brownie-contracts
+	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "ORACLES/01-chainlink-foundry/lib/chainlink"]
+	path = ORACLES/01-chainlink-foundry/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
+[submodule "ORACLES/01-chainlink-foundry/lib/chainlink-evm"]
+	path = ORACLES/01-chainlink-foundry/lib/chainlink-evm
+	url = https://github.com/smartcontractkit/chainlink-evm
+[submodule "ORACLES/01-chainlink-foundry/lib/chainlink-local"]
+	path = ORACLES/01-chainlink-foundry/lib/chainlink-local
+	url = https://github.com/smartcontractkit/chainlink-local

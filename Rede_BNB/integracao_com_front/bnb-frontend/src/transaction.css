@@ -1,0 +1,57 @@
+.tx-card {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  font-family: var(--font-sans);
+}
+
+/* Título da seção */
+.tx-card h2 {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-heading);
+  text-align: center;
+}
+
+/* Campo de formulário */
+.tx-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.tx-field label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Inputs estilizados */
+.tx-input {
+  padding: 0.65rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tx-input:focus {
+  outline: none;
+  border-color: var(--color-link);
+  box-shadow: 0 0 0 3px rgba(246, 133, 27, 0.2);
+}
+
+/* Responsividade simples */
+@media (max-width: 480px) {
+  .tx-card {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  .tx-card h2 {
+    font-size: 1.5rem;
+  }
+}

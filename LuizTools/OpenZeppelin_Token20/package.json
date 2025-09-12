@@ -1,0 +1,17 @@
+{
+  "name": "openzeppelin_token20",
+  "version": "1.0.0",
+  "description": "Create Token",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tales",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}

@@ -1,0 +1,17 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  filename    String
+  content     Bytes
+  sha256Hash  String   @unique @map("sha256_hash")
+  txHash      String?  @map("tx_hash")
+  createdAt   DateTime @default(now()) @map("created_at")
+}

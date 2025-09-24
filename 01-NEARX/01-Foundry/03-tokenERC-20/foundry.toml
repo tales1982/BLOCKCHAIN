@@ -1,0 +1,16 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+remappings = [
+  "forge-std/=lib/forge-std/src/",
+  # permite importar como: import "solady/tokens/ERC20.sol";
+  "solady/=lib/solady/src/",
+  # permite importar como: import "@solady/src/tokens/ERC20.sol";
+  "@solady/=lib/solady/"
+]
+# 👇 fixa o compilador
+solc_version = "0.8.28"
+
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

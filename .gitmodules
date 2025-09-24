@@ -34,3 +34,9 @@
 [submodule "ORACLES/01-chainlink-foundry/lib/chainlink-local"]
 	path = ORACLES/01-chainlink-foundry/lib/chainlink-local
 	url = https://github.com/smartcontractkit/chainlink-local
+[submodule "01-NEARX/01-Foundry/01-estalacaoFoundry/lib/forge-std"]
+	path = 01-NEARX/01-Foundry/01-estalacaoFoundry/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "01-NEARX/01-Foundry/02-counter/lib/forge-std"]
+	path = 01-NEARX/01-Foundry/02-counter/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

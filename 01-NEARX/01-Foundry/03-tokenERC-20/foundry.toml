@@ -11,6 +11,9 @@ remappings = [
 ]
 # 👇 fixa o compilador
 solc_version = "0.8.28"
+[profile.coverage]
+exclude = ["script/Counter.s.sol", "src/Counter.sol"]
+
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

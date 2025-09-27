@@ -18,6 +18,10 @@ contract Token is ERC20 {
         return "TOKEN";
     }
 
+    
+
+    
+
     // (opcional) padronize 18 casas
     // function decimals() public view override returns (uint8) { return 18; }
 }

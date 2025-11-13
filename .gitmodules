@@ -49,3 +49,12 @@
 [submodule "06-Base-Web3/01-conection-Ansil/lib/forge-std"]
 	path = 06-Base-Web3/01-conection-Ansil/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "07-projetosSimples/contract/lib/openzeppelin-contracts"]
+	path = 07-projetosSimples/contract/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "01-NEARX/04-Dex-polygon/dex-contract/lib/forge-std"]
+	path = 01-NEARX/04-Dex-polygon/dex-contract/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "01-NEARX/04-Dex-polygon/dex-contract/lib/openzeppelin-contracts"]
+	path = 01-NEARX/04-Dex-polygon/dex-contract/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

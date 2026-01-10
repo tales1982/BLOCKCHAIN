@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercício Completo - Mini Identity Registry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        h2 {
+            color: var(--secondary);
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        h3 {
+            color: var(--primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: var(--secondary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .nav-menu {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 5px solid var(--primary);
+        }
+
+        .nav-menu a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin: 5px 15px 5px 0;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: var(--success);
+            color: #155724;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: var(--info);
+            color: #0c5460;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: var(--warning);
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: var(--danger);
+            color: #721c24;
+        }
+
+        .file-header {
+            background: #21252b;
+            color: #61afef;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-left: 4px solid #61afef;
+            margin-top: 20px;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            margin: 0 0 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .file-header + .code-block {
+            margin-top: 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
+            word-wrap: normal;
+        }
+
+        .step-box {
+            background: var(--light);
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+
+        .command {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .layer-diagram {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .layer {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 2em;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .checkpoint {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 5px solid #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Exercício Completo: Mini Identity Registry</h1>
+        <p class="subtitle">Aprenda o Fluxo Blockchain Completo: Frontend → Backend → Lib → Blockchain</p>
+
+        <!-- NAVEGAÇÃO -->
+        <div class="nav-menu">
+            <strong style="display: block; margin-bottom: 15px;">📑 Navegação Rápida</strong>
+            <a href="#introducao">Introdução</a>
+            <a href="#parte1">Parte 1: Setup</a>
+            <a href="#parte2">Parte 2: Smart Contract</a>
+            <a href="#parte3">Parte 3: Lib Java</a>
+            <a href="#parte4">Parte 4: Backend</a>
+            <a href="#parte5">Parte 5: Frontend</a>
+            <a href="#parte6">Parte 6: Integração</a>
+            <a href="#checklist">Checklist</a>
+        </div>
+
+        <!-- INTRODUÇÃO -->
+        <h2 id="introducao">📖 Introdução</h2>
+        
+        <div class="alert alert-success">
+            <h3 style="margin-top: 0;">🎯 Objetivo do Exercício</h3>
+            <p>Você vai construir um sistema completo que:</p>
+            <ul>
+                <li>✅ Marca endereços como "verificados" na blockchain</li>
+                <li>✅ Consulta se um endereço está verificado</li>
+                <li>✅ Cobre TODO o fluxo: Frontend → Backend → Lib → Blockchain</li>
+                <li>✅ Usa as mesmas tecnologias do sistema real (Zaori)</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-info">
+            <h3 style="margin-top: 0;">🛠️ Tecnologias que Você Vai Aprender</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Camada</th>
+                        <th>Tecnologia</th>
+                        <th>O Que Faz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Frontend</strong></td>
+                        <td>Next.js 14 + Redux + Ethers.js v6</td>
+                        <td>Criar e assinar transações com MetaMask</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backend</strong></td>
+                        <td>Spring Boot 3 + Java 21</td>
+                        <td>Receber requisições e orquestrar</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lib</strong></td>
+                        <td>Web3j 5.0.1</td>
+                        <td>Broadcast e leitura da blockchain</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Blockchain</strong></td>
+                        <td>Anvil (Foundry)</td>
+                        <td>Rede local Ethereum</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="layer-diagram">
+            <h3 style="text-align: center; margin-bottom: 20px;">🔄 Fluxo Completo</h3>
+            
+            <div class="layer">
+                <strong>1️⃣ FRONTEND (Next.js + Redux)</strong>
+                <p>→ Usuário clica "Set Verified"</p>
+                <p>→ Redux Thunk conecta MetaMask</p>
+                <p>→ Assina transação com <code>prepareAndSignTransaction</code></p>
+                <p>→ POST para backend com transação assinada</p>
+            </div>
+            
+            <div class="arrow-down">↓</div>
+            
+            <div class="layer">
+                <strong>2️⃣ BACKEND (Spring Boot)</strong>
+                <p>→ Controller recebe requisição</p>
+                <p>→ Valida JWT</p>
+                <p>→ Service chama Web3jBroadcastService</p>
+            </div>
+            
+            <div class="arrow-down">↓</div>
+            
+            <div class="layer">
+                <strong>3️⃣ LIB (Web3j)</strong>
+                <p>→ Web3jBroadcastService faz <code>eth_sendRawTransaction</code></p>
+                <p>→ Aguarda confirmação (polling receipt)</p>
+                <p>→ Retorna transaction receipt</p>
+            </div>
+            
+            <div class="arrow-down">↓</div>
+            
+            <div class="layer">
+                <strong>4️⃣ BLOCKCHAIN (Anvil)</strong>
+                <p>→ Executa <code>setVerified(address, true)</code></p>
+                <p>→ Minera o bloco</p>
+                <p>→ Estado atualizado!</p>
+            </div>
+        </div>
+
+        <!-- PARTE 1: SETUP -->
+        <h2 id="parte1">🚀 Parte 1: Setup do Ambiente</h2>
+
+        <div class="step-box">
+            <h3><span class="step-number">1</span>Pré-requisitos</h3>
+            <p>Certifique-se de ter instalado:</p>
+            <ul>
+                <li>✅ Node.js 18+ (<code>node --version</code>)</li>
+                <li>✅ Java 21+ (<code>java --version</code>)</li>
+                <li>✅ Foundry (Anvil) - <a href="https://book.getfoundry.sh/getting-started/installation">Instalar aqui</a></li>
+                <li>✅ Gradle 8+ (ou use wrapper incluído)</li>
+                <li>✅ MetaMask (extensão do navegador)</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">2</span>Estrutura de Pastas</h3>
+            <p>Crie a seguinte estrutura:</p>
+            <div class="command">
+mini-identity-registry/
+├── blockchain/              # Smart contracts
+│   ├── src/
+│   │   └── MiniIdentityRegistry.sol
+│   ├── script/
+│   │   └── Deploy.s.sol
+│   └── foundry.toml
+├── lib-java/                # Lib Web3j
+│   ├── src/main/java/com/miniregistry/
+│   │   ├── Web3jBroadcastService.java
+│   │   └── IdentityRegistryReadService.java
+│   └── build.gradle
+├── backend/                 # Spring Boot
+│   ├── src/main/java/com/miniregistry/
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── dto/
+│   │   └── config/
+│   ├── src/main/resources/
+│   │   └── application.properties
+│   └── build.gradle
+└── frontend/                # Next.js
+    ├── src/
+    │   ├── app/
+    │   ├── components/
+    │   ├── store/
+    │   └── lib/
+    └── package.json
+            </div>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">3</span>Iniciar Blockchain Local</h3>
+            <p>Em um terminal, rode:</p>
+            <div class="command">anvil</div>
+            <p>Você verá algo como:</p>
+            <div class="command">
+Listening on 127.0.0.1:8545
+
+Available Accounts:
+(0) 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (10000 ETH)
+Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+            </div>
+        </div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 1:</strong> Anvil está rodando? Terminal mostrando "Listening on 127.0.0.1:8545"?
+        </div>
+
+        <!-- PARTE 2: SMART CONTRACT -->
+        <h2 id="parte2">📝 Parte 2: Smart Contract Solidity</h2>
+
+        <div class="alert alert-info">
+            <strong>📚 O que você vai aprender:</strong>
+            <ul>
+                <li>Escrever um contrato Solidity simples</li>
+                <li>Função de escrita (<code>setVerified</code>)</li>
+                <li>Função de leitura (<code>isVerified</code>)</li>
+                <li>Deploy com Foundry</li>
+            </ul>
+        </div>
+
+        <h3>Passo 2.1: Criar o Contrato</h3>
+
+        <div class="file-header">📄 blockchain/src/MiniIdentityRegistry.sol</div>
+        <div class="code-block"><pre>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract MiniIdentityRegistry {
+    
+    // Mapeamento: endereço => verificado?
+    mapping(address => bool) private verified;
+    
+    // Evento emitido quando um endereço é verificado/não-verificado
+    event VerifiedStatusUpdated(address indexed user, bool status);
+    
+    /**
+     * @notice Define o status de verificação de um endereço
+     * @param user O endereço a ser marcado
+     * @param status true = verificado, false = não verificado
+     */
+    function setVerified(address user, bool status) external {
+        verified[user] = status;
+        emit VerifiedStatusUpdated(user, status);
+    }
+    
+    /**
+     * @notice Verifica se um endereço está verificado
+     * @param user O endereço a verificar
+     * @return true se verificado, false caso contrário
+     */
+    function isVerified(address user) external view returns (bool) {
+        return verified[user];
+    }
+}</pre></div>
+
+        <h3>Passo 2.2: Script de Deploy</h3>
+
+        <div class="file-header">📄 blockchain/script/Deploy.s.sol</div>
+        <div class="code-block"><pre>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Script.sol";
+import "../src/MiniIdentityRegistry.sol";
+
+contract DeployScript is Script {
+    function run() external {
+        vm.startBroadcast();
+        
+        MiniIdentityRegistry registry = new MiniIdentityRegistry();
+        
+        console.log("MiniIdentityRegistry deployed at:", address(registry));
+        
+        vm.stopBroadcast();
+    }
+}</pre></div>
+
+        <h3>Passo 2.3: Configuração Foundry</h3>
+
+        <div class="file-header">📄 blockchain/foundry.toml</div>
+        <div class="code-block"><pre>[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"</pre></div>
+
+        <h3>Passo 2.4: Deploy no Anvil</h3>
+
+        <div class="command">cd blockchain
+forge install foundry-rs/forge-std --no-commit
+forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast</div>
+
+        <p>Copie o endereço do contrato que aparecerá no log:</p>
+        <div class="command">MiniIdentityRegistry deployed at: 0x5FbDB2315678afecb367f032d93F642f64180aa3</div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 2:</strong> Contrato deployado? Você tem o endereço? Anote ele!
+        </div>
+
+        <!-- PARTE 3: LIB JAVA -->
+        <h2 id="parte3">📦 Parte 3: Lib Java (Web3j)</h2>
+
+        <div class="alert alert-info">
+            <strong>📚 O que você vai aprender:</strong>
+            <ul>
+                <li>Criar uma lib Java reutilizável</li>
+                <li>Usar Web3j para broadcast (<code>eth_sendRawTransaction</code>)</li>
+                <li>Usar Web3j para leitura (<code>eth_call</code>)</li>
+                <li>Polling de transaction receipt</li>
+            </ul>
+        </div>
+
+        <h3>Passo 3.1: Configurar Gradle</h3>
+
+        <div class="file-header">📄 lib-java/build.gradle</div>
+        <div class="code-block"><pre>plugins {
+    id 'java'
+}
+
+group = 'com.miniregistry'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.web3j:core:5.0.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}</pre></div>
+
+        <h3>Passo 3.2: Web3jBroadcastService</h3>
+
+        <div class="file-header">📄 lib-java/src/main/java/com/miniregistry/Web3jBroadcastService.java</div>
+        <div class="code-block"><pre>package com.miniregistry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.http.HttpService;
+
+import java.io.IOException;
+import java.util.Optional;
+
+public class Web3jBroadcastService {
+
+    private static final Logger log = LoggerFactory.getLogger(Web3jBroadcastService.class);
+    private final Web3j web3j;
+
+    public Web3jBroadcastService(String nodeUrl) {
+        this.web3j = Web3j.build(new HttpService(nodeUrl));
+        log.info("Web3j conectado em: {}", nodeUrl);
+    }
+
+    /**
+     * Faz broadcast de uma transação assinada
+     * @param signedTransaction Transação em formato hex (0x...)
+     * @return Hash da transação
+     */
+    public String broadcastTransaction(String signedTransaction) throws IOException {
+        log.info("Broadcasting transação...");
+        
+        EthSendTransaction response = web3j.ethSendRawTransaction(signedTransaction).send();
+        
+        if (response.hasError()) {
+            String errorMsg = response.getError().getMessage();
+            log.error("Erro no broadcast: {}", errorMsg);
+            throw new RuntimeException("Erro ao fazer broadcast: " + errorMsg);
+        }
+        
+        String txHash = response.getTransactionHash();
+        log.info("Transação enviada! Hash: {}", txHash);
+        
+        return txHash;
+    }
+
+    /**
+     * Aguarda o receipt da transação (com retry)
+     * @param txHash Hash da transação
+     * @return TransactionReceipt
+     */
+    public TransactionReceipt waitForReceipt(String txHash) throws Exception {
+        log.info("Aguardando confirmação da transação: {}", txHash);
+        
+        int maxAttempts = 30;
+        int attempt = 0;
+        
+        while (attempt < maxAttempts) {
+            Optional<TransactionReceipt> receipt = web3j
+                .ethGetTransactionReceipt(txHash)
+                .send()
+                .getTransactionReceipt();
+            
+            if (receipt.isPresent()) {
+                log.info("✅ Transação confirmada no bloco: {}", 
+                    receipt.get().getBlockNumber());
+                return receipt.get();
+            }
+            
+            attempt++;
+            log.debug("Tentativa {}/{} - Aguardando confirmação...", attempt, maxAttempts);
+            Thread.sleep(1000); // Aguarda 1 segundo
+        }
+        
+        throw new RuntimeException("Timeout aguardando confirmação da transação");
+    }
+}</pre></div>
+
+        <h3>Passo 3.3: IdentityRegistryReadService</h3>
+
+        <div class="file-header">📄 lib-java/src/main/java/com/miniregistry/IdentityRegistryReadService.java</div>
+        <div class="code-block"><pre>package com.miniregistry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Bool;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.http.HttpService;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class IdentityRegistryReadService {
+
+    private static final Logger log = LoggerFactory.getLogger(IdentityRegistryReadService.class);
+    private final Web3j web3j;
+
+    public IdentityRegistryReadService(String nodeUrl) {
+        this.web3j = Web3j.build(new HttpService(nodeUrl));
+    }
+
+    /**
+     * Verifica se um endereço está verificado
+     * @param contractAddress Endereço do contrato
+     * @param userAddress Endereço do usuário
+     * @return true se verificado, false caso contrário
+     */
+    public boolean isVerified(String contractAddress, String userAddress) throws Exception {
+        log.info("Verificando status de: {}", userAddress);
+        
+        // 1. Criar a função ABI
+        Function function = new Function(
+            "isVerified",
+            Arrays.asList(new Address(userAddress)),
+            Arrays.asList(new TypeReference<Bool>() {})
+        );
+        
+        // 2. Encodar a função
+        String encodedFunction = FunctionEncoder.encode(function);
+        
+        // 3. Fazer eth_call (não custa gas!)
+        String result = web3j.ethCall(
+            Transaction.createEthCallTransaction(null, contractAddress, encodedFunction),
+            DefaultBlockParameterName.LATEST
+        ).send().getValue();
+        
+        // 4. Decodificar o resultado
+        List<Type> decoded = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+        
+        boolean isVerified = (Boolean) decoded.get(0).getValue();
+        log.info("Status de {}: {}", userAddress, isVerified ? "VERIFICADO" : "NÃO VERIFICADO");
+        
+        return isVerified;
+    }
+}</pre></div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 3:</strong> Compilou a lib Java? <code>cd lib-java && ./gradlew build</code>
+        </div>
+
+        <!-- PARTE 4: BACKEND -->
+        <h2 id="parte4">🌐 Parte 4: Backend Spring Boot</h2>
+
+        <div class="alert alert-info">
+            <strong>📚 O que você vai aprender:</strong>
+            <ul>
+                <li>Controller REST com Spring Boot</li>
+                <li>Service layer pattern</li>
+                <li>DTOs (Request/Response)</li>
+                <li>Configuração de beans</li>
+                <li>Integração com lib Web3j</li>
+            </ul>
+        </div>
+
+        <h3>Passo 4.1: Configurar build.gradle do Backend</h3>
+
+        <div class="file-header">📄 backend/build.gradle</div>
+        <div class="code-block"><pre>plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.miniregistry'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Nossa lib (localmente)
+    implementation project(':lib-java')
+    
+    // Lombok (opcional, mas útil)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}</pre></div>
+
+        <h3>Passo 4.2: DTOs</h3>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/dto/BroadcastRequest.java</div>
+        <div class="code-block"><pre>package com.miniregistry.dto;
+
+public record BroadcastRequest(
+    String signedTransaction,
+    String address,
+    boolean verified
+) {}</pre></div>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/dto/BroadcastResponse.java</div>
+        <div class="code-block"><pre>package com.miniregistry.dto;
+
+public record BroadcastResponse(
+    String transactionHash,
+    String blockNumber,
+    String status
+) {}</pre></div>
+
+        <h3>Passo 4.3: Configuration</h3>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/config/Web3jConfig.java</div>
+        <div class="code-block"><pre>package com.miniregistry.config;
+
+import com.miniregistry.IdentityRegistryReadService;
+import com.miniregistry.Web3jBroadcastService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Web3jConfig {
+
+    @Value("${blockchain.node.url}")
+    private String nodeUrl;
+
+    @Bean
+    public Web3jBroadcastService web3jBroadcastService() {
+        return new Web3jBroadcastService(nodeUrl);
+    }
+
+    @Bean
+    public IdentityRegistryReadService identityRegistryReadService() {
+        return new IdentityRegistryReadService(nodeUrl);
+    }
+}</pre></div>
+
+        <h3>Passo 4.4: Service</h3>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/service/RegistryService.java</div>
+        <div class="code-block"><pre>package com.miniregistry.service;
+
+import com.miniregistry.IdentityRegistryReadService;
+import com.miniregistry.Web3jBroadcastService;
+import com.miniregistry.dto.BroadcastResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+@Service
+public class RegistryService {
+
+    private static final Logger log = LoggerFactory.getLogger(RegistryService.class);
+
+    private final Web3jBroadcastService broadcastService;
+    private final IdentityRegistryReadService readService;
+
+    @Value("${blockchain.contract.address}")
+    private String contractAddress;
+
+    public RegistryService(
+        Web3jBroadcastService broadcastService,
+        IdentityRegistryReadService readService
+    ) {
+        this.broadcastService = broadcastService;
+        this.readService = readService;
+    }
+
+    public BroadcastResponse broadcast(String signedTransaction) {
+        try {
+            log.info("Iniciando broadcast...");
+            
+            // 1. Fazer broadcast
+            String txHash = broadcastService.broadcastTransaction(signedTransaction);
+            
+            // 2. Aguardar confirmação
+            TransactionReceipt receipt = broadcastService.waitForReceipt(txHash);
+            
+            // 3. Verificar status
+            String status = receipt.isStatusOK() ? "SUCCESS" : "FAILED";
+            
+            log.info("✅ Broadcast concluído! Status: {}", status);
+            
+            return new BroadcastResponse(
+                txHash,
+                receipt.getBlockNumber().toString(),
+                status
+            );
+            
+        } catch (Exception e) {
+            log.error("❌ Erro no broadcast", e);
+            throw new RuntimeException("Erro ao processar transação: " + e.getMessage());
+        }
+    }
+
+    public boolean isVerified(String address) {
+        try {
+            return readService.isVerified(contractAddress, address);
+        } catch (Exception e) {
+            log.error("Erro ao verificar endereço", e);
+            throw new RuntimeException("Erro ao verificar: " + e.getMessage());
+        }
+    }
+}</pre></div>
+
+        <h3>Passo 4.5: Controller</h3>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/controller/RegistryController.java</div>
+        <div class="code-block"><pre>package com.miniregistry.controller;
+
+import com.miniregistry.dto.BroadcastRequest;
+import com.miniregistry.dto.BroadcastResponse;
+import com.miniregistry.service.RegistryService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/registry")
+@CrossOrigin(origins = "http://localhost:3000")
+public class RegistryController {
+
+    private final RegistryService service;
+
+    public RegistryController(RegistryService service) {
+        this.service = service;
+    }
+
+    @PostMapping("/broadcast")
+    public ResponseEntity<BroadcastResponse> broadcast(@RequestBody BroadcastRequest request) {
+        BroadcastResponse response = service.broadcast(request.signedTransaction());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/is-verified")
+    public ResponseEntity<Boolean> isVerified(@RequestParam String address) {
+        boolean verified = service.isVerified(address);
+        return ResponseEntity.ok(verified);
+    }
+}</pre></div>
+
+        <h3>Passo 4.6: Application Properties</h3>
+
+        <div class="file-header">📄 backend/src/main/resources/application.properties</div>
+        <div class="code-block"><pre>server.port=8080
+
+# Blockchain config
+blockchain.node.url=http://127.0.0.1:8545
+blockchain.contract.address=0x5FbDB2315678afecb367f032d93F642f64180aa3
+
+# Logging
+logging.level.com.miniregistry=DEBUG</pre></div>
+
+        <h3>Passo 4.7: Main Application</h3>
+
+        <div class="file-header">📄 backend/src/main/java/com/miniregistry/MiniRegistryApplication.java</div>
+        <div class="code-block"><pre>package com.miniregistry;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MiniRegistryApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MiniRegistryApplication.class, args);
+    }
+}</pre></div>
+
+        <div class="step-box">
+            <h3>Testar o Backend</h3>
+            <div class="command">cd backend
+./gradlew bootRun</div>
+            <p>Deve aparecer: <code>Started MiniRegistryApplication in X seconds</code></p>
+        </div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 4:</strong> Backend rodando em <code>http://localhost:8080</code>?
+        </div>
+
+        <!-- PARTE 5: FRONTEND -->
+        <h2 id="parte5">⚛️ Parte 5: Frontend Next.js + Redux</h2>
+
+        <div class="alert alert-info">
+            <strong>📚 O que você vai aprender:</strong>
+            <ul>
+                <li>Next.js 14 com App Router</li>
+                <li>Redux Toolkit com Thunks</li>
+                <li>Ethers.js v6 para assinar transações</li>
+                <li>Integração com MetaMask</li>
+                <li>Função <code>prepareAndSignTransaction</code></li>
+            </ul>
+        </div>
+
+        <h3>Passo 5.1: Configurar Next.js</h3>
+
+        <div class="command">npx create-next-app@latest frontend
+# Escolha: TypeScript, App Router, Tailwind CSS</div>
+
+        <div class="command">cd frontend
+npm install @reduxjs/toolkit react-redux ethers@6</div>
+
+        <h3>Passo 5.2: ABI do Contrato</h3>
+
+        <div class="file-header">📄 frontend/src/abi/MiniIdentityRegistry.json</div>
+        <div class="code-block"><pre>[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "isVerified",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "setVerified",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "VerifiedStatusUpdated",
+    "type": "event"
+  }
+]</pre></div>
+
+        <h3>Passo 5.3: Utilitário de Assinatura</h3>
+
+        <div class="file-header">📄 frontend/src/lib/prepareAndSignTransaction.ts</div>
+        <div class="code-block"><pre>import { ethers } from "ethers";
+
+export async function prepareAndSignTransaction({
+  contractAddress,
+  abi,
+  functionName,
+  args,
+  signer,
+}: {
+  contractAddress: string;
+  abi: any[];
+  functionName: string;
+  args: any[];
+  signer: ethers.Signer;
+}) {
+  console.log("🔐 Preparando transação...");
+
+  // 1. Criar instância do contrato
+  const contract = new ethers.Contract(contractAddress, abi, signer);
+
+  // 2. Encodar os dados da função
+  const data = contract.interface.encodeFunctionData(functionName, args);
+
+  // 3. Obter provider e configurações
+  const provider = signer.provider!;
+  const from = await signer.getAddress();
+  const nonce = await provider.getTransactionCount(from);
+  const network = await provider.getNetwork();
+
+  // 4. Estimar gas
+  const gasLimit = await contract[functionName].estimateGas(...args);
+
+  // 5. Montar objeto da transação
+  const tx: ethers.TransactionRequest = {
+    to: contractAddress,
+    data,
+    gasLimit,
+    nonce,
+    chainId: network.chainId,
+  };
+
+  // 6. Configurar gas price
+  const feeData = await provider.getFeeData();
+  tx.type = 0; // Legacy transaction
+  tx.gasPrice = feeData.gasPrice || undefined;
+
+  console.log("📝 Transação preparada:", tx);
+
+  // 7. ASSINAR a transação
+  try {
+    const signedTransaction = await signer.signTransaction(tx);
+    const transactionHash = ethers.keccak256(signedTransaction);
+
+    console.log("✅ Transação assinada!");
+    console.log("Hash:", transactionHash);
+
+    return {
+      signedTransaction,
+      transactionHash,
+    };
+  } catch (error: any) {
+    // Fallback para carteiras que não suportam signTransaction
+    const message = String(error?.message || "");
+    if (message.includes("eth_signTransaction")) {
+      console.warn("⚠️ Carteira não suporta signTransaction, usando sendTransaction");
+      const response = await signer.sendTransaction(tx);
+      return {
+        signedTransaction: null,
+        transactionHash: response.hash,
+      };
+    }
+    throw error;
+  }
+}</pre></div>
+
+        <h3>Passo 5.4: Redux Store</h3>
+
+        <div class="file-header">📄 frontend/src/store/store.ts</div>
+        <div class="code-block"><pre>import { configureStore } from '@reduxjs/toolkit';
+import registryReducer from './slices/registrySlice';
+
+export const store = configureStore({
+  reducer: {
+    registry: registryReducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;</pre></div>
+
+        <h3>Passo 5.5: Redux Slice com Thunks</h3>
+
+        <div class="file-header">📄 frontend/src/store/slices/registrySlice.ts</div>
+        <div class="code-block"><pre>import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { ethers } from 'ethers';
+import { prepareAndSignTransaction } from '@/lib/prepareAndSignTransaction';
+import MiniRegistryABI from '@/abi/MiniIdentityRegistry.json';
+
+const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const BACKEND_URL = 'http://localhost:8080/api/registry';
+
+interface RegistryState {
+  loading: boolean;
+  error: string | null;
+  lastTxHash: string | null;
+  verifiedStatus: boolean | null;
+}
+
+const initialState: RegistryState = {
+  loading: false,
+  error: null,
+  lastTxHash: null,
+  verifiedStatus: null,
+};
+
+// THUNK 1: Broadcast de setVerified
+export const broadcastSetVerified = createAsyncThunk(
+  'registry/broadcastSetVerified',
+  async ({ address, verified }: { address: string; verified: boolean }) => {
+    // 1. Conectar MetaMask
+    if (!window.ethereum) {
+      throw new Error('MetaMask não encontrado!');
+    }
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send('eth_requestAccounts', []);
+    const signer = await provider.getSigner();
+
+    console.log('👛 Conectado com:', await signer.getAddress());
+
+    // 2. Preparar e assinar transação
+    const { signedTransaction, transactionHash } = await prepareAndSignTransaction({
+      contractAddress: CONTRACT_ADDRESS,
+      abi: MiniRegistryABI,
+      functionName: 'setVerified',
+      args: [address, verified],
+      signer,
+    });
+
+    // 3. Enviar para backend
+    const response = await fetch(`${BACKEND_URL}/broadcast`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        signedTransaction: signedTransaction || transactionHash,
+        address,
+        verified,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro no backend');
+    }
+
+    const result = await response.json();
+    console.log('✅ Resposta do backend:', result);
+
+    return result.transactionHash;
+  }
+);
+
+// THUNK 2: Verificar status
+export const checkVerified = createAsyncThunk(
+  'registry/checkVerified',
+  async (address: string) => {
+    const response = await fetch(`${BACKEND_URL}/is-verified?address=${address}`);
+    
+    if (!response.ok) {
+      throw new Error('Erro ao verificar');
+    }
+
+    const isVerified = await response.json();
+    return isVerified;
+  }
+);
+
+const registrySlice = createSlice({
+  name: 'registry',
+  initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    // broadcastSetVerified
+    builder
+      .addCase(broadcastSetVerified.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(broadcastSetVerified.fulfilled, (state, action) => {
+        state.loading = false;
+        state.lastTxHash = action.payload;
+      })
+      .addCase(broadcastSetVerified.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro desconhecido';
+      });
+
+    // checkVerified
+    builder
+      .addCase(checkVerified.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(checkVerified.fulfilled, (state, action) => {
+        state.loading = false;
+        state.verifiedStatus = action.payload;
+      })
+      .addCase(checkVerified.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro desconhecido';
+      });
+  },
+});
+
+export const { clearError } = registrySlice.actions;
+export default registrySlice.reducer;</pre></div>
+
+        <h3>Passo 5.6: Componente React</h3>
+
+        <div class="file-header">📄 frontend/src/components/RegistryManager.tsx</div>
+        <div class="code-block"><pre>'use client';
+
+import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { broadcastSetVerified, checkVerified } from '@/store/slices/registrySlice';
+
+export default function RegistryManager() {
+  const dispatch = useAppDispatch();
+  const { loading, error, lastTxHash, verifiedStatus } = useAppSelector(
+    (state) => state.registry
+  );
+
+  const [address, setAddress] = useState('');
+  const [verified, setVerified] = useState(true);
+
+  const handleSetVerified = async () => {
+    if (!address) {
+      alert('Digite um endereço!');
+      return;
+    }
+
+    try {
+      await dispatch(broadcastSetVerified({ address, verified })).unwrap();
+      alert('✅ Transação confirmada!');
+    } catch (err: any) {
+      alert('❌ Erro: ' + err.message);
+    }
+  };
+
+  const handleCheckVerified = async () => {
+    if (!address) {
+      alert('Digite um endereço!');
+      return;
+    }
+
+    try {
+      await dispatch(checkVerified(address)).unwrap();
+    } catch (err: any) {
+      alert('❌ Erro: ' + err.message);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold text-purple-600 mb-6">
+        Mini Identity Registry
+      </h1>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Endereço Ethereum
+          </label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="0x..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={verified}
+            onChange={(e) => setVerified(e.target.checked)}
+            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+          />
+          <label className="text-sm font-medium text-gray-700">
+            Marcar como Verificado
+          </label>
+        </div>
+
+        <div className="flex space-x-4">
+          <button
+            onClick={handleSetVerified}
+            disabled={loading}
+            className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-400 transition"
+          >
+            {loading ? 'Processando...' : 'Set Verified'}
+          </button>
+
+          <button
+            onClick={handleCheckVerified}
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 transition"
+          >
+            Check Verified
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <strong>Erro:</strong> {error}
+          </div>
+        )}
+
+        {lastTxHash && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <strong>✅ Sucesso!</strong>
+            <p className="text-sm mt-1">TX Hash: {lastTxHash}</p>
+          </div>
+        )}
+
+        {verifiedStatus !== null && (
+          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+            <strong>Status:</strong> {verifiedStatus ? '✅ VERIFICADO' : '❌ NÃO VERIFICADO'}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}</pre></div>
+
+        <h3>Passo 5.7: Hooks do Redux</h3>
+
+        <div class="file-header">📄 frontend/src/store/hooks.ts</div>
+        <div class="code-block"><pre>import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from './store';
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;</pre></div>
+
+        <h3>Passo 5.8: Provider</h3>
+
+        <div class="file-header">📄 frontend/src/app/providers.tsx</div>
+        <div class="code-block"><pre>'use client';
+
+import { Provider } from 'react-redux';
+import { store } from '@/store/store';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <Provider store={store}>{children}</Provider>;
+}</pre></div>
+
+        <h3>Passo 5.9: Página Principal</h3>
+
+        <div class="file-header">📄 frontend/src/app/page.tsx</div>
+        <div class="code-block"><pre>import RegistryManager from '@/components/RegistryManager';
+
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 py-12">
+      <RegistryManager />
+    </main>
+  );
+}</pre></div>
+
+        <h3>Passo 5.10: Layout com Provider</h3>
+
+        <div class="file-header">📄 frontend/src/app/layout.tsx</div>
+        <div class="code-block"><pre>import './globals.css';
+import { Providers } from './providers';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="pt-BR">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}</pre></div>
+
+        <div class="step-box">
+            <h3>Rodar o Frontend</h3>
+            <div class="command">cd frontend
+npm run dev</div>
+            <p>Acesse: <code>http://localhost:3000</code></p>
+        </div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 5:</strong> Frontend rodando? Interface aparecendo?
+        </div>
+
+        <!-- PARTE 6: INTEGRAÇÃO -->
+        <h2 id="parte6">🔗 Parte 6: Teste de Integração Completa</h2>
+
+        <div class="alert alert-success">
+            <h3 style="margin-top: 0;">🎯 Teste End-to-End</h3>
+            <p>Agora vamos testar o fluxo completo!</p>
+        </div>
+
+        <h3>Passo 6.1: Preparação</h3>
+
+        <div class="step-box">
+            <p>Certifique-se de que está rodando:</p>
+            <ul>
+                <li>✅ Terminal 1: <code>anvil</code></li>
+                <li>✅ Terminal 2: <code>cd backend && ./gradlew bootRun</code></li>
+                <li>✅ Terminal 3: <code>cd frontend && npm run dev</code></li>
+            </ul>
+        </div>
+
+        <h3>Passo 6.2: Configurar MetaMask</h3>
+
+        <div class="step-box">
+            <ol>
+                <li>Abra MetaMask</li>
+                <li>Adicione uma rede customizada:
+                    <ul>
+                        <li><strong>Nome:</strong> Anvil Local</li>
+                        <li><strong>RPC URL:</strong> http://127.0.0.1:8545</li>
+                        <li><strong>Chain ID:</strong> 31337</li>
+                        <li><strong>Symbol:</strong> ETH</li>
+                    </ul>
+                </li>
+                <li>Importe a conta do Anvil:
+                    <ul>
+                        <li><strong>Private Key:</strong> <code>0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80</code></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <h3>Passo 6.3: Teste WRITE (setVerified)</h3>
+
+        <div class="step-box">
+            <ol>
+                <li>Acesse <code>http://localhost:3000</code></li>
+                <li>Digite um endereço: <code>0x70997970C51812dc3A010C7d01b50e0d17dc79C8</code></li>
+                <li>Marque o checkbox "Verificado"</li>
+                <li>Clique em <strong>"Set Verified"</strong></li>
+                <li>Aprove a transação no MetaMask</li>
+                <li>Aguarde a confirmação</li>
+            </ol>
+            
+            <p><strong>Resultado esperado:</strong></p>
+            <ul>
+                <li>✅ MetaMask abre para aprovar</li>
+                <li>✅ Transação é assinada</li>
+                <li>✅ Backend faz broadcast</li>
+                <li>✅ Anvil minera o bloco</li>
+                <li>✅ UI mostra "Sucesso!" com TX Hash</li>
+            </ul>
+        </div>
+
+        <h3>Passo 6.4: Teste READ (isVerified)</h3>
+
+        <div class="step-box">
+            <ol>
+                <li>Com o mesmo endereço do passo anterior</li>
+                <li>Clique em <strong>"Check Verified"</strong></li>
+            </ol>
+            
+            <p><strong>Resultado esperado:</strong></p>
+            <ul>
+                <li>✅ Backend faz <code>eth_call</code></li>
+                <li>✅ UI mostra "Status: ✅ VERIFICADO"</li>
+            </ul>
+        </div>
+
+        <h3>Passo 6.5: Validação nos Logs</h3>
+
+        <div class="step-box">
+            <h4>Backend deve mostrar:</h4>
+            <div class="command">Broadcasting transação...
+Transação enviada! Hash: 0x...
+Aguardando confirmação da transação: 0x...
+✅ Transação confirmada no bloco: 2
+✅ Broadcast concluído! Status: SUCCESS</div>
+
+            <h4>Frontend (console do navegador):</h4>
+            <div class="command">🔐 Preparando transação...
+📝 Transação preparada: {...}
+✅ Transação assinada!
+Hash: 0x...
+✅ Resposta do backend: {...}</div>
+
+            <h4>Anvil deve mostrar:</h4>
+            <div class="command">eth_sendRawTransaction
+eth_getTransactionReceipt
+
+  Transaction: 0x...
+  Block: 2
+  Status: Success (1)</div>
+        </div>
+
+        <div class="checkpoint">
+            <strong>✅ CHECKPOINT 6:</strong> Tudo funcionou? Conseguiu marcar e verificar um endereço?
+        </div>
+
+        <!-- CHECKLIST FINAL -->
+        <h2 id="checklist">📋 Checklist de Aprendizado</h2>
+
+        <div class="alert alert-success">
+            <h3 style="margin-top: 0;">Você aprendeu:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conceito</th>
+                        <th>Onde Viu</th>
+                        <th>Entendeu?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Smart Contract Solidity</td>
+                        <td>MiniIdentityRegistry.sol</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Deploy com Foundry</td>
+                        <td>forge script</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Web3j - Broadcast (eth_sendRawTransaction)</td>
+                        <td>Web3jBroadcastService.java</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Web3j - Read (eth_call)</td>
+                        <td>IdentityRegistryReadService.java</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Receipt Polling</td>
+                        <td>waitForReceipt()</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Spring Boot Controller</td>
+                        <td>RegistryController.java</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Spring Boot Service</td>
+                        <td>RegistryService.java</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>DTOs (Request/Response)</td>
+                        <td>BroadcastRequest/Response</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Spring Configuration Beans</td>
+                        <td>Web3jConfig.java</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Ethers.js - Assinar Transações</td>
+                        <td>prepareAndSignTransaction.ts</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Encode Function Data (ABI)</td>
+                        <td>contract.interface.encodeFunctionData()</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Gas Estimation</td>
+                        <td>estimateGas()</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Nonce Management</td>
+                        <td>getTransactionCount()</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Redux Toolkit</td>
+                        <td>registrySlice.ts</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Redux Thunks (Async)</td>
+                        <td>createAsyncThunk</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Next.js 14 App Router</td>
+                        <td>app/page.tsx</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Integração MetaMask</td>
+                        <td>BrowserProvider</td>
+                        <td>☐</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>🎯 Perguntas de Validação</h2>
+
+        <div class="alert alert-warning">
+            <p>Se você conseguir responder essas perguntas, dominou o fluxo:</p>
+            <ol>
+                <li><strong>Quem assina a transação?</strong> → Frontend (MetaMask)</li>
+                <li><strong>O backend tem acesso à chave privada?</strong> → NUNCA!</li>
+                <li><strong>O que o backend faz no WRITE?</strong> → Broadcast (eth_sendRawTransaction)</li>
+                <li><strong>O que o backend faz no READ?</strong> → eth_call (sem custo de gas)</li>
+                <li><strong>Por que READ não paga gas?</strong> → Não cria transação, apenas lê estado</li>
+                <li><strong>Onde fica o contrato?</strong> → Blockchain (Anvil)</li>
+                <li><strong>O que faz o Web3jBroadcastService?</strong> → Envia tx assinada e aguarda receipt</li>
+                <li><strong>O que é um Thunk?</strong> → Função assíncrona do Redux</li>
+                <li><strong>Para que serve o ABI?</strong> → Encodar/decodificar chamadas de funções</li>
+                <li><strong>O que é nonce?</strong> → Contador de transações do endereço</li>
+            </ol>
+        </div>
+
+        <h2>🚀 Próximos Passos</h2>
+
+        <div class="alert alert-info">
+            <h3 style="margin-top: 0;">Evolua o Exercício:</h3>
+            <ol>
+                <li><strong>Batch Operations:</strong> Implemente <code>batchSetVerified</code> para múltiplos endereços</li>
+                <li><strong>Security:</strong> Adicione JWT no backend</li>
+                <li><strong>Error Handling:</strong> Melhore tratamento de erros (retry logic)</li>
+                <li><strong>UI/UX:</strong> Adicione loading states e toasts</li>
+                <li><strong>Events:</strong> Escute eventos <code>VerifiedStatusUpdated</code> com WebSocket</li>
+                <li><strong>Database:</strong> Salve transações no PostgreSQL</li>
+                <li><strong>Tests:</strong> Adicione testes unitários e integração</li>
+            </ol>
+        </div>
+
+        <div class="alert alert-success" style="margin-top: 40px; text-align: center;">
+            <h2 style="margin-bottom: 20px;">🎉 Parabéns!</h2>
+            <p style="font-size: 1.2em;">
+                Você construiu um sistema blockchain completo do zero!<br>
+                Agora você entende o fluxo: <strong>Frontend → Backend → Lib → Blockchain</strong>
+            </p>
+            <p style="margin-top: 20px;">
+                Este é exatamente o mesmo fluxo usado em sistemas reais de produção! 🚀
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <p style="color: #666; font-size: 0.9em;">
+                📖 Exercício criado para aprendizado prático de blockchain<br>
+                Baseado no fluxo real do sistema Zaori Capital<br>
+                <strong>Stack:</strong> Solidity + Foundry + Web3j + Spring Boot + Next.js + Redux + Ethers.js
+            </p>
+        </div>
+    </div>
+
+    <a href="#" class="back-to-top" title="Voltar ao topo">↑</a>
+</body>
+</html>

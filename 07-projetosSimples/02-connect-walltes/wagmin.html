@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Masterclass: React + Wagmi + Vite</title>
+    <style>
+        :root {
+            --primary: #f6851b; /* MetaMask Orange */
+            --primary-hover: #e2761b;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --code-bg: #000000;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .preview-sidebar {
+                position: static !important;
+            }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #334155;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Steps */
+        .step-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #334155;
+            transition: transform 0.3s ease;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        /* Code Blocks */
+        .code-container {
+            position: relative;
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .code-container pre {
+            color: #d1d5db;
+        }
+
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+
+        /* Preview Sidebar */
+        .preview-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .app-simulator {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 0;
+            color: #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 8px solid #334155;
+        }
+
+        .simulator-header {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .simulator-content {
+            padding: 2rem;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn-connect {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(246, 133, 27, 0.4);
+        }
+
+        .btn-connect:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-disconnect {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .status-connected { background: #dcfce7; color: #166534; }
+        .status-disconnected { background: #fee2e2; color: #991b1b; }
+
+        /* Wallet Info */
+        .wallet-info {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .address-text {
+            font-family: monospace;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        /* Success Message */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web3 Tutorial: React + Wagmi</h1>
+        <p>Aprenda a conectar sua MetaMask de forma profissional e escalável.</p>
+    </header>
+
+    <div class="container">
+        <!-- Main Content: Tutorial Steps -->
+        <main>
+            <!-- Passo 1 -->
+            <div class="step-card">
+                <span class="step-number">1</span>
+                <h2>Iniciando o Projeto com Vite</h2>
+                <p>O Vite é o "bundler" mais rápido para React hoje. Vamos começar criando a estrutura base.</p>
+                <div class="code-container">
+                    <pre>npm create vite@latest meu-app-web3 -- --template react-ts
+<span class="comment"># Siga os passos e depois:</span>
+cd meu-app-web3
+npm install</pre>
+                </div>
+            </div>
+
+            <!-- Passo 2 -->
+            <div class="step-card">
+                <span class="step-number">2</span>
+                <h2>Instalando as Bibliotecas Web3</h2>
+                <p>Utilizaremos <strong>Wagmi</strong> para hooks, <strong>Viem</strong> para interagir com a rede e <strong>TanStack Query</strong> para gerenciar os estados.</p>
+                <div class="code-container">
+                    <pre>npm install wagmi viem @tanstack/react-query</pre>
+                </div>
+            </div>
+
+            <!-- Passo 3 -->
+            <div class="step-card">
+                <span class="step-number">3</span>
+                <h2>Configurando o Wagmi</h2>
+                <p>Crie um arquivo chamado <code style="color:var(--accent)">wagmi.ts</code> para configurar os conectores e as redes.</p>
+                <div class="code-container">
+                    <pre><span class="keyword">import</span> { http, createConfig } <span class="keyword">from</span> <span class="string">'wagmi'</span>
+<span class="keyword">import</span> { mainnet, sepolia } <span class="keyword">from</span> <span class="string">'wagmi/chains'</span>
+<span class="keyword">import</span> { injected } <span class="keyword">from</span> <span class="string">'wagmi/connectors'</span>
+
+<span class="keyword">export const</span> config = <span class="function">createConfig</span>({
+  chains: [mainnet, sepolia],
+  connectors: [ <span class="function">injected</span>() ], <span class="comment">// Aqui injetamos a MetaMask</span>
+  transports: {
+    [mainnet.id]: <span class="function">http</span>(),
+    [sepolia.id]: <span class="function">http</span>(),
+  },
+})</pre>
+                </div>
+            </div>
+
+            <!-- Passo 4 -->
+            <div class="step-card">
+                <span class="step-number">4</span>
+                <h2>O Componente de Conexão</h2>
+                <p>Este é o coração do seu app. Usaremos os hooks <code style="color:var(--accent)">useAccount</code>, <code style="color:var(--accent)">useConnect</code> e <code style="color:var(--accent)">useDisconnect</code>.</p>
+                <div class="code-container">
+                    <pre><span class="keyword">function</span> <span class="function">WalletComponent</span>() {
+  <span class="keyword">const</span> { address, isConnected } = <span class="function">useAccount</span>()
+  <span class="keyword">const</span> { connect, connectors } = <span class="function">useConnect</span>()
+  <span class="keyword">const</span> { disconnect } = <span class="function">useDisconnect</span>()
+
+  <span class="keyword">if</span> (isConnected) <span class="keyword">return</span> (
+    &lt;div&gt;
+      Conectado: {address}
+      &lt;button onClick={() => <span class="function">disconnect</span>()}&gt;Desconectar&lt;/button&gt;
+    &lt;/div&gt;
+  )
+
+  <span class="keyword">return</span> (
+    &lt;button onClick={() => <span class="function">connect</span>({ connector: connectors[0] })}&gt;
+      Conectar MetaMask
+    &lt;/button&gt;
+  )
+}</pre>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Interactive Demo -->
+        <aside class="preview-sidebar">
+            <div class="app-simulator">
+                <div class="simulator-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <span style="font-size: 12px; color: #94a3b8; margin-left: 10px;">localhost:5173</span>
+                </div>
+                <div class="simulator-content" id="sim-content">
+                    <!-- Initial State -->
+                    <div id="logged-out-view">
+                        <div class="status-badge status-disconnected">Não Conectado</div>
+                        <h3 style="margin-bottom: 1.5rem;">Meu App Web3</h3>
+                        <button class="btn-connect" onclick="simulateConnect()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" width="24" alt="MetaMask">
+                            Conectar MetaMask
+                        </button>
+                    </div>
+
+                    <!-- Connected State (Hidden initially) -->
+                    <div id="logged-in-view" style="display: none;">
+                        <div class="status-badge status-connected">Conectado</div>
+                        <h3 style="margin-bottom: 0.5rem;">Bem-vindo!</h3>
+                        <div class="wallet-info">
+                            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Sua Carteira:</p>
+                            <span class="address-text">0x71C7...fA45</span>
+                            <div style="margin-top: 10px; font-size: 0.9rem;">
+                                <strong>Saldo:</strong> 1.25 ETH
+                            </div>
+                        </div>
+                        <button class="btn-disconnect" onclick="simulateDisconnect()">Desconectar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: #1e293b; border-radius: 12px; font-size: 0.9rem;">
+                <p>💡 <strong>Dica de Especialista:</strong> No Wagmi v2, sempre envolva seu App com o <code>QueryClientProvider</code> do TanStack Query, caso contrário os hooks não funcionarão!</p>
+            </div>
+        </aside>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script>
+        // Sound Effects with Tone.js
+        let synth;
+        
+        function initAudio() {
+            if (!synth) {
+                synth = new Tone.PolySynth(Tone.Synth).toDestination();
+            }
+        }
+
+        function playConnectSound() {
+            initAudio();
+            const now = Tone.now();
+            synth.triggerAttackRelease("C4", "8n", now);
+            synth.triggerAttackRelease("E4", "8n", now + 0.1);
+            synth.triggerAttackRelease("G4", "4n", now + 0.2);
+        }
+
+        function playDisconnectSound() {
+            initAudio();
+            const now = Tone.now();
+            synth.triggerAttackRelease("G3", "8n", now);
+            synth.triggerAttackRelease("C3", "4n", now + 0.1);
+        }
+
+        // Simulation Logic
+        function simulateConnect() {
+            const btn = document.querySelector('.btn-connect');
+            btn.innerHTML = 'Conectando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('logged-out-view').style.display = 'none';
+                document.getElementById('logged-in-view').style.display = 'block';
+                playConnectSound();
+                startConfetti();
+                
+                // Reset button for next time
+                btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" width="24"> Conectar MetaMask';
+                btn.disabled = false;
+            }, 800);
+        }
+
+        function simulateDisconnect() {
+            document.getElementById('logged-in-view').style.display = 'none';
+            document.getElementById('logged-out-view').style.display = 'block';
+            playDisconnectSound();
+        }
+
+        // Confetti Effect for "Success"
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 8 + 4;
+                this.speedY = Math.random() * -15 - 5;
+                this.speedX = Math.random() * 6 - 3;
+                this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                this.gravity = 0.2;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.speedY += this.gravity;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        function startConfetti() {
+            particles = [];
+            for(let i=0; i<50; i++) {
+                particles.push(new Particle());
+            }
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if(p.y > canvas.height + 20) particles.splice(index, 1);
+            });
+            if(particles.length > 0) requestAnimationFrame(animate);
+        }
+
+        // Log for developers
+        console.log("Web3 Tutorial Simulator Initialized.");
+        console.log("Ready to connect to the decentralized future!");
+    </script>
+</body>
+</html>

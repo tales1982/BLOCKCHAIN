@@ -6,6 +6,8 @@ import { ethers } from 'ethers';
 function App() {
   const [carteira, setCarteira] = useState(null);
   const [saldo, setSaldo] = useState(null);
+  
+  
 
   // Função para conectar
   const conectar = async () => {
@@ -29,6 +31,28 @@ function App() {
       alert("Por favor, instale a MetaMask!");
     }
   };
+
+async function converterEthParaEur(quantidadeEth) {
+  const response = await fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur"
+  );
+
+  const data = await response.json();
+
+  const precoEthEmEur = data.ethereum.eur;
+
+  const valorEmEur = quantidadeEth * precoEthEmEur;
+
+  return valorEmEur;
+}
+
+// Exemplo de uso
+converterEthParaEur(1).then(valor => {
+  console.log(`0.5 ETH = €${valor.toFixed(2)}`);
+});
+
+
+
 
   // Função para desconectar (simulada no Front)
   const desconectar = () => {

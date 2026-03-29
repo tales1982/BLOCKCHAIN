@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Web3: Conectar MetaMask</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        /* Seção do Aplicativo (Demo Interativo) */
+        .app-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .app-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Status da Carteira */
+        .wallet-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .address-badge {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 0.5rem;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .address-badge.visible {
+            display: inline-flex;
+        }
+
+        .balance {
+            font-size: 0.9rem;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .balance.visible {
+            opacity: 1;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-connect {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-connect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-disconnect {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-disconnect:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Tutorial Section */
+        .tutorial-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tutorial-header {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+        }
+
+        .step p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        code {
+            background: #1e293b;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: #fb7185;
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #334155;
+            margin-top: 0.5rem;
+        }
+
+        .code-block code {
+            background: transparent;
+            color: #38bdf8;
+            padding: 0;
+        }
+
+        .code-comment {
+            color: #64748b !important;
+            font-style: italic;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+            margin-right: 10px;
+        }
+
+        .btn.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- APP DEMO SECTION -->
+        <section class="app-section">
+            <h1 class="app-title">DApp Demo Interativa</h1>
+            <p class="app-subtitle">Experimente a conexão com a MetaMask diretamente aqui.</p>
+            
+            <div class="wallet-status" id="wallet-container">
+                <!-- Estado: Desconectado -->
+                <button id="connect-btn" class="btn btn-connect" onclick="handleConnect()">
+                    <span class="spinner"></span>
+                    <span>Conectar Carteira</span>
+                </button>
+
+                <!-- Estado: Conectado (Oculto por padrão) -->
+                <div id="connected-view" style="display: none; flex-direction: column; align-items: center; gap: 1rem; width: 100%;">
+                    <div class="address-badge" id="address-badge">
+                        <span>🔗</span> <span id="address-text">0x123...abc</span>
+                    </div>
+                    <div class="balance" id="balance-text">ETH 0.00</div>
+                    
+                    <button class="btn btn-disconnect" onclick="handleDisconnect()">
+                        Desconectar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TUTORIAL SECTION -->
+        <section class="tutorial-section">
+            <h2 class="tutorial-header">Tutorial: Como fazer isso no React</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-muted);">
+                Veja abaixo o guia passo a passo para criar este projeto do zero usando <strong>React</strong>, <strong>Vite</strong> e <strong>Ethers.js</strong>.
+            </p>
+
+            <div class="step">
+                <h3>1. Preparando o Ambiente</h3>
+                <p>Você precisa do <strong>Node.js</strong> instalado no computador. Após garantir isso, abra seu terminal e crie um novo projeto Vite:</p>
+                <div class="code-block">
+                    <code>npm create vite@latest minha-carteira -- --template react</code>
+                </div>
+                <p style="margin-top: 0.5rem;">Depois, entre na pasta e instale as dependências básicas:</p>
+                <div class="code-block">
+                    <code>cd minha-carteira</code><br>
+                    <code>npm install</code>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>2. Instalando o Ethers.js</h3>
+                <p>O Ethers.js é a biblioteca que facilita a comunicação com a blockchain. Instale via npm:</p>
+                <div class="code-block">
+                    <code>npm install ethers</code>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>3. Escrevendo o Código (App.jsx)</h3>
+                <p>Abra o arquivo <code>src/App.jsx</code> e substitua pelo código abaixo. É aqui que a mágica acontece!</p>
+                
+                <div class="code-block">
+<pre><code><span class="code-comment">// src/App.jsx</span>
+import { useState, useEffect } from 'react';
+import './App.css';
+import { ethers } from 'ethers';
+
+function App() {
+  const [carteira, setCarteira] = useState(null);
+  const [saldo, setSaldo] = useState(null);
+
+  <span class="code-comment">// Função para conectar</span>
+  const conectar = async () => {
+    if (window.ethereum) {
+      try {
+        <span class="code-comment">// 1. Pede permissão para conectar</span>
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const endereco = await signer.getAddress();
+        
+        setCarteira(endereco);
+        
+        <span class="code-comment">// 2. Busca o saldo (opcional)</span>
+        const balance = await provider.getBalance(endereco);
+        setSaldo(ethers.formatEther(balance));
+        
+      } catch (error) {
+        console.error("Erro ao conectar:", error);
+      }
+    } else {
+      alert("Por favor, instale a MetaMask!");
+    }
+  };
+
+  <span class="code-comment">// Função para desconectar (simulada no Front)</span>
+  const desconectar = () => {
+    setCarteira(null);
+    setSaldo(null);
+  };
+
+  return (
+    &lt;div className="app-container"&gt;
+      &lt;h1&gt;Minha DApp&lt;/h1&gt;
+      
+      {!carteira ? (
+        &lt;button onClick={conectar}&gt;Conectar Carteira&lt;/button&gt;
+      ) : (
+        &lt;div&gt;
+          &lt;p&gt;Conectado: {carteira}&lt;/p&gt;
+          &lt;p&gt;Saldo: {saldo} ETH&lt;/p&gt;
+          &lt;button onClick={desconectar}&gt;Desconectar&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>4. Executando o Projeto</h3>
+                <p>Volte ao terminal e rode o comando de desenvolvimento:</p>
+                <div class="code-block">
+                    <code>npm run dev</code>
+                </div>
+                <p>Clique no link local (ex: <code>http://localhost:5173</code>) que aparecerá no terminal e teste sua aplicação!</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        ⚠️ MetaMask não detectada! Por favor, instale para testar.
+    </div>
+
+    <script>
+        // Lógica JavaScript para o Demo Interativo funcionar no navegador
+
+        const connectBtn = document.getElementById('connect-btn');
+        const connectedView = document.getElementById('connected-view');
+        const addressBadge = document.getElementById('address-badge');
+        const addressText = document.getElementById('address-text');
+        const balanceText = document.getElementById('balance-text');
+        const toast = document.getElementById('toast');
+
+        // Função de conexão simulada
+        async function handleConnect() {
+            if (typeof window.ethereum === 'undefined') {
+                showToast();
+                return;
+            }
+
+            // UI Loading State
+            connectBtn.classList.add('loading');
+            connectBtn.querySelector('span:last-child').textContent = "Conectando...";
+
+            try {
+                // Criando Provider e Solicitando Contas (Igual no tutorial React)
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+                
+                // Atualizar UI
+                addressText.textContent = address;
+                
+                // Simular busca de saldo
+                const rawBalance = await provider.getBalance(address);
+                const formattedBalance = ethers.formatEther(rawBalance);
+
+                // Transição suave
+                setTimeout(() => {
+                    connectBtn.style.display = 'none';
+                    connectedView.style.display = 'flex';
+                    addressBadge.classList.add('visible');
+                    
+                    // Pequeno delay para o texto do saldo aparecer suavemente
+                    setTimeout(() => {
+                        balanceText.textContent = `${formattedBalance} ETH`;
+                        balanceText.classList.add('visible');
+                    }, 300);
+                }, 800);
+
+            } catch (error) {
+                console.error(error);
+                connectBtn.classList.remove('loading');
+                connectBtn.querySelector('span:last-child').textContent = "Tentar Novamente";
+            }
+        }
+
+        // Função de desconexão
+        function handleDisconnect() {
+            connectedView.style.display = 'none';
+            addressBadge.classList.remove('visible');
+            balanceText.classList.remove('visible');
+            connectBtn.style.display = 'inline-flex';
+            connectBtn.classList.remove('loading');
+            connectBtn.querySelector('span:last-child').textContent = "Conectar Carteira";
+            
+            // Reset de textos
+            balanceText.textContent = "";
+            addressText.textContent = "";
+        }
+
+        // Função de notificação
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Verificar se já conectado ao carregar (Opcional)
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const accounts = await provider.listAccounts();
+                    if (accounts.length > 0) {
+                        handleConnect();
+                    }
+                } catch (e) {
+                    // Silencioso
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 function App() {
   const [carteira, setCarteira] = useState(null);
   const [saldo, setSaldo] = useState(null);
+  const [saldoEuro, setSaldoEuro] = useState(null);
   
   
 
@@ -17,13 +18,18 @@ function App() {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const endereco = await signer.getAddress();
-        
+
         setCarteira(endereco);
-        
+
         // 2. Busca o saldo (opcional)
         const balance = await provider.getBalance(endereco);
-        setSaldo(ethers.formatEther(balance));
-        
+        const saldoEmEth = ethers.formatEther(balance);
+        setSaldo(saldoEmEth);
+
+        // 3. Converte para Euro
+        const valorEmEuro = await converterEthParaEur(parseFloat(saldoEmEth));
+        setSaldoEuro(valorEmEuro);
+
       } catch (error) {
         console.error("Erro ao conectar:", error);
       }
@@ -46,11 +52,6 @@ async function converterEthParaEur(quantidadeEth) {
   return valorEmEur;
 }
 
-// Exemplo de uso
-converterEthParaEur(1).then(valor => {
-  console.log(`0.5 ETH = €${valor.toFixed(2)}`);
-});
-
 
 
 
@@ -58,6 +59,7 @@ converterEthParaEur(1).then(valor => {
   const desconectar = () => {
     setCarteira(null);
     setSaldo(null);
+    setSaldoEuro(null);
   };
 
   return (
@@ -70,6 +72,7 @@ converterEthParaEur(1).then(valor => {
         <div>
           <p>Conectado: {carteira}</p>
           <p>Saldo: {saldo} ETH</p>
+          <p>Saldo: €{saldoEuro ? saldoEuro.toFixed(2) : 'Calculando...'}</p>
           <button onClick={desconectar}>Desconectar</button>
         </div>
       )}

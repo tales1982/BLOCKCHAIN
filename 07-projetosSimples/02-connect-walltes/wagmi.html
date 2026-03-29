@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manual Completo: Conectar MetaMask com wagmi 3.3.1</title>
+    <meta
+      name="description"
+      content="Manual completo com passo a passo e codigo para conectar a MetaMask usando wagmi@3.3.1."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f5f0;
+        --ink: #1f1d1a;
+        --muted: #5f5a52;
+        --accent: #e07a35;
+        --panel: #ffffff;
+        --line: #e6e0d8;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        --sans: "Georgia", "Times New Roman", serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        color: var(--ink);
+        background: linear-gradient(180deg, #f7f5f0 0%, #efe9df 100%);
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 40px 24px 64px;
+      }
+      header {
+        border-bottom: 2px solid var(--line);
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+      }
+      h1 {
+        font-size: 34px;
+        margin: 0 0 8px;
+        color: var(--accent);
+        letter-spacing: 0.3px;
+      }
+      p {
+        line-height: 1.6;
+        color: var(--muted);
+      }
+      section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px 22px;
+        margin: 18px 0;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 0 0 12px;
+      }
+      h3 {
+        font-size: 18px;
+        margin: 18px 0 8px;
+      }
+      ol {
+        padding-left: 20px;
+      }
+      li {
+        margin: 10px 0;
+      }
+      code,
+      pre {
+        font-family: var(--mono);
+      }
+      pre {
+        background: #f3f0ea;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        overflow: auto;
+        white-space: pre-wrap; /* permite quebrar linhas longas */
+        word-wrap: break-word; /* evita estouro horizontal em comandos grandes */
+      }
+      .note {
+        border-left: 4px solid var(--accent);
+        padding-left: 12px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 820px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Manual Completo: conectar MetaMask com wagmi@3.3.1</h1>
+        <p>
+          Este manual descreve o passo a passo completo e o codigo necessario
+          para conectar a MetaMask em um projeto React + Vite com wagmi 3.3.1.
+        </p>
+      </header>
+
+      <section>
+        <h2>1) Requisitos e versoes (projeto real)</h2>
+        <div class="grid">
+          <div>
+            <p class="note">
+              Use exatamente estas versoes para evitar incompatibilidades.
+            </p>
+            <pre><code>wagmi: ^3.3.1
+viem: ^2.44.1
+@tanstack/react-query: ^5.90.16
+react: ^19.2.0
+react-dom: ^19.2.0
+vite: ^7.2.4</code></pre>
+          </div>
+          <div>
+            <h3>Instalacao</h3>
+            <pre><code>npm install wagmi viem @tanstack/react-query</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>2) Configurando o wagmi (igual ao projeto)</h2>
+        <p>
+          Arquivo <code>src/wagmi.ts</code> real do projeto, usando as redes
+          <code>mainnet</code> e <code>sepolia</code> com o conector
+          <code>injected</code> (MetaMask).
+        </p>
+        <pre><code>// src/wagmi.ts
+import { http, createConfig } from "wagmi";
+import { mainnet, sepolia } from "wagmi/chains";
+import { injected } from "wagmi/connectors";
+
+const URL_RPC_MAINET = import.meta.env.VITE_ALCHEMY_MAINNET_URL;
+const URL_RPC_SEPOLIA = import.meta.env.VITE_ALCHEMY_SEPOLIA_URL;
+
+export const config = createConfig({
+  chains: [mainnet, sepolia], // redes usadas
+  connectors: [injected()], // conector MetaMask
+  transports: {
+    [mainnet.id]: http(URL_RPC_MAINET),
+    [sepolia.id]: http(URL_RPC_SEPOLIA),
+  },
+});</code></pre>
+        <p class="note">
+          Os valores <code>VITE_ALCHEMY_MAINNET_URL</code> e
+          <code>VITE_ALCHEMY_SEPOLIA_URL</code> devem estar definidos no
+          arquivo <code>.env</code> na raiz do projeto. Nunca commite sua chave
+          real em reposit&oacute;rio publico.
+        </p>
+      </section>
+
+      <section>
+        <h2>3) Providers no entrypoint (src/main.tsx real)</h2>
+        <p>
+          No <code>src/main.tsx</code>, o app precisa estar dentro de
+          <code>WagmiProvider</code> e <code>QueryClientProvider</code>.
+        </p>
+        <pre><code>// src/main.tsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiProvider } from 'wagmi'
+import { config } from './wagmi.ts'
+
+const queryClient = new QueryClient()
+
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
+    &lt;WagmiProvider config={config}&gt;
+      &lt;QueryClientProvider client={queryClient}&gt;
+        &lt;App /&gt;
+      &lt;/QueryClientProvider&gt;
+    &lt;/WagmiProvider&gt;
+  &lt;/StrictMode&gt;
+)</code></pre>
+      </section>
+
+      <section>
+        <h2>4) Componente de conexao (src/ConectWallet.tsx real)</h2>
+        <p>
+          Este &eacute; o componente exatamente como est&aacute; no seu
+          projeto, usando <code>useConnection</code>,
+          <code>useConnect</code>, <code>useDisconnect</code> e
+          <code>useConnectors</code> do wagmi 3.3.1.
+        </p>
+        <pre><code>// src/ConectWallet.tsx
+import { useConnect, useDisconnect, useConnection, useConnectors } from 'wagmi'
+
+const ConnectWallet = () =&gt; {
+  const connection = useConnection()
+  const connect = useConnect()
+  const disconnect = useDisconnect()
+  const connectors = useConnectors()
+
+  const isConnected = connection.status === 'connected'
+  const address = connection.address
+
+  if (isConnected) {
+    return (
+      &lt;div&gt;
+        &lt;button onClick={() =&gt; disconnect.mutate()}&gt;Desconectar&lt;/button&gt;
+        &lt;br /&gt;
+        conectado: {address}
+      &lt;/div&gt;
+    )
+  }
+
+  return (
+    &lt;button onClick={() =&gt; connect.mutate({ connector: connectors[0] })}&gt;
+      Conectar MetaMask
+    &lt;/button&gt;
+  )
+}
+
+export default ConnectWallet</code></pre>
+      </section>
+
+      <section>
+        <h2>5) Usar o componente na App (src/App.tsx real)</h2>
+        <pre><code>// src/App.tsx
+import './App.css'
+import ConnectWallet from './ConectWallet'
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;ConnectWallet /&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+      </section>
+
+      <section>
+        <h2>6) Fluxo completo de conexao</h2>
+        <ol>
+          <li>O navegador carrega o Vite e o React a partir do main.tsx.</li>
+          <li>O WagmiProvider registra a config e as redes.</li>
+          <li>O QueryClientProvider habilita o cache interno do wagmi.</li>
+          <li>O botao chama connect() com injected() e abre a MetaMask.</li>
+          <li>Ao aprovar, isConnected vira true e o endereco aparece.</li>
+        </ol>
+      </section>
+    </main>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

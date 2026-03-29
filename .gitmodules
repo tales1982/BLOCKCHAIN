@@ -58,3 +58,15 @@
 [submodule "01-NEARX/04-Dex-polygon/dex-contract/lib/openzeppelin-contracts"]
 	path = 01-NEARX/04-Dex-polygon/dex-contract/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "08-exercicios/01-level-beginer/01-exercicio/lib/forge-std"]
+	path = 08-exercicios/01-level-beginer/01-exercicio/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "08-exercicios/01-level-beginer/02-exercicio/lib/forge-std"]
+	path = 08-exercicios/01-level-beginer/02-exercicio/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "08-exercicios/01-level-beginer/03-exercicio/lib/forge-std"]
+	path = 08-exercicios/01-level-beginer/03-exercicio/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "08-exercicios/01-level-beginer/04-exercicio/lib/forge-std"]
+	path = 08-exercicios/01-level-beginer/04-exercicio/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

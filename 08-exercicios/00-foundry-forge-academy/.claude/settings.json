@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s http://localhost:8080/projects)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

@@ -6,6 +6,29 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { CodeBlock } from "@/components/CodeBlock";
 import { useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronRight, ArrowLeft, Star, Lightbulb, AlertTriangle, Award, ListChecks, BookOpen } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { Components } from "react-markdown";
+
+function extractText(children: unknown): string {
+  if (typeof children === "string") return children;
+  if (Array.isArray(children)) return children.map(extractText).join("");
+  return "";
+}
+
+const mdComponents: Components = {
+  p: ({ children }) => <p className="mb-2">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  pre: ({ children }) => <>{children}</>,
+  code: ({ children, className }) => {
+    const isBlock = className?.startsWith("language-");
+    if (isBlock) {
+      const lang = className?.replace("language-", "") ?? "solidity";
+      return <CodeBlock code={extractText(children).replace(/\n$/, "")} language={lang} />;
+    }
+    return <code className="bg-secondary/70 text-primary px-1 py-0.5 rounded text-xs font-mono">{children}</code>;
+  },
+};
 
 export default function ExerciseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -89,7 +112,11 @@ export default function ExerciseDetail() {
         </Section>
 
         <Section id="challenge" icon={<Award className="w-4 h-4 text-accent" />} title={t("exercise.challenge")}>
-          <p className="text-sm text-foreground/80 leading-relaxed">{pt?.challenge ?? exercise.challenge}</p>
+          <div className="text-sm text-foreground/80 leading-relaxed space-y-2">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+              {pt?.challenge ?? exercise.challenge}
+            </ReactMarkdown>
+          </div>
         </Section>
 
         <Section id="hints" icon={<Lightbulb className="w-4 h-4 text-info" />} title={t("exercise.hints")}>
